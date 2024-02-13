@@ -4,19 +4,18 @@ import { AgentResponse } from '../types/AgentResponse';
 import { SlashCommand } from '../../types/AgentsYml';
 import { Workflow } from './Workflow';
 import { Agent } from '..';
+import { Factory } from '../../types/Factory';
 
-interface WorkFlowManagerFactory {
-  createWorklowManager(path: string): WorkflowManager;
-}
+type WorkFlowManagerFactory = Factory<WorkflowManager | undefined, string>;
 
-let workflowManagerFactory: WorkFlowManagerFactory | undefined = undefined;
+let workflowManagerFactory: WorkFlowManagerFactory = (_path: string) => undefined;
 
 export const setWorkflowManagerFactory = (factory: WorkFlowManagerFactory) => {
   workflowManagerFactory = factory;
 };
 
 export const createWorkflowManager = (path: string) => {
-  return workflowManagerFactory?.createWorklowManager(path);
+  return workflowManagerFactory(path);
 };
 
 export interface WorkflowManager {
