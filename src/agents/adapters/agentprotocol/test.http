@@ -1,0 +1,6 @@
+POST http://localhost:8000/ap/v1/agent/tasks
+Content-Type: application/json
+
+{
+    "input": "Hello"
+}
