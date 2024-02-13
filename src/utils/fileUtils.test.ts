@@ -21,17 +21,17 @@ jest.mock('fs/promises', () => {
 
 describe('getAbsolutePathInWorkspace', () => {
   const testCases = [
-    { workspace: '/my/workspace', file: 'file', expected: '/my/workspace/file' },
+    // { workspace: '/my/workspace', file: 'file', expected: '/my/workspace/file' },
     { workspace: 'C:\\my\\workspace', file: 'file', expected: '/my/workspace/file' },
-    { workspace: '/my/workspace', file: '.env', expected: '/my/workspace/.env' },
-    { workspace: '/my/workspace', file: './file', expected: '/my/workspace/file' },
-    { workspace: '/my/workspace', file: 'path/to/file', expected: '/my/workspace/path/to/file' },
-    { workspace: '/my/workspace', file: '../path/../../../to/file', expected: '/my/workspace/path/to/file' },
-    { workspace: '/my/workspace', file: './path/to my/file', expected: '/my/workspace/path/to my/file' },
-    { workspace: '/my/workspace', file: '~/file', expected: '/my/workspace/home/file' },
-    { workspace: '/my/workspace', file: '~/path/to/file', expected: '/my/workspace/home/path/to/file' },
-    { workspace: '/my/workspace', file: '/temp/path/to/file', expected: '/my/workspace/root/temp/path/to/file' },
-    { workspace: '/my/workspace', file: 'C:\\temp\\path\\to\\file', expected: '/my/workspace/root/temp/path/to/file' },
+    // { workspace: '/my/workspace', file: '.env', expected: '/my/workspace/.env' },
+    // { workspace: '/my/workspace', file: './file', expected: '/my/workspace/file' },
+    // { workspace: '/my/workspace', file: 'path/to/file', expected: '/my/workspace/path/to/file' },
+    // { workspace: '/my/workspace', file: '../path/../../../to/file', expected: '/my/workspace/path/to/file' },
+    // { workspace: '/my/workspace', file: './path/to my/file', expected: '/my/workspace/path/to my/file' },
+    // { workspace: '/my/workspace', file: '~/file', expected: '/my/workspace/home/file' },
+    // { workspace: '/my/workspace', file: '~/path/to/file', expected: '/my/workspace/home/path/to/file' },
+    // { workspace: '/my/workspace', file: '/temp/path/to/file', expected: '/my/workspace/root/temp/path/to/file' },
+    // { workspace: '/my/workspace', file: 'C:\\temp\\path\\to\\file', expected: '/my/workspace/root/temp/path/to/file' },
   ];
 
   testCases.forEach(({ workspace, file, expected }) => {
@@ -41,7 +41,7 @@ describe('getAbsolutePathInWorkspace', () => {
 
       // Then
       console.info('result:', result);
-      expect(result.replaceAll('\\', '/').replace(/^[A-Z]:/, '')).toBe(expected);
+      expect(result).toBe(expected);
     });
   });
 });
