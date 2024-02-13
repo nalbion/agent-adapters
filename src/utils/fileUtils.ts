@@ -23,13 +23,10 @@ export function getAbsolutePathInWorkspace(workspaceFolder: string, filePath: st
   } else if (filePath.startsWith('/')) {
     filePath = 'root' + filePath;
   } else {
-    console.info('filepath 4:', filePath);
     filePath = filePath.replace(/^[A-Za-z]:/, 'root');
   }
 
-  console.info('resolveed path:', workspaceFolder, filePath);
   let absolutePath = path.resolve(workspaceFolder, filePath);
-  console.info('absolutePath:', absolutePath);
 
   return absolutePath;
 }
