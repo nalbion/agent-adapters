@@ -54,8 +54,8 @@ describe('ToolManager', () => {
     expect(tool).toBeDefined();
   });
 
-  it('should execute a tool', () => {
-    const result = ToolManager.executeTool(toolName, toolContext, parameters);
+  it('should execute a tool', async () => {
+    const result = await ToolManager.executeTool(toolName, toolContext, parameters);
     const expectedResult = 'toolCallback foo bar';
     expect(result).toEqual(expectedResult);
   });
