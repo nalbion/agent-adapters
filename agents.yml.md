@@ -26,7 +26,7 @@ config_list:
     api_key: YOUR_API_KEY
 ```
 
-This section is *optional* if you have a `OAI_CONFIG_LIST` environment variable or JSON file in `~/` or `~/.agents/` which could be shared by [AutoGen] and other libraries/frameworks.
+This section is _optional_ if you have a `OAI_CONFIG_LIST` environment variable or JSON file in `~/` or `~/.agents/` which could be shared by [AutoGen] and other libraries/frameworks.
 
 ## agents
 
@@ -90,26 +90,26 @@ Example:
     vscode: true
     remote:
       base_url: http://localhost:8000
-````
+```
 
 ## Agent as CLI Process
 
 You can spawn a new process to run an Agent written in any language.
 
 ```yaml
-  - name: evo_ninja
-    description: Research, analyse and build software
-    icon: https://evo.ninja/favicon.ico
-    vscode: true
-    git:
-      repo: https://github.com/polywrap/evo.ninja
-      branch: dev
-      baseDir: ~/.agents/evo.ninja
-    cli:
-      command: cmd.exe
-      args: ["/K", "yarn", "start"]
-      cwd: ~/.agents/evo.ninja
-      wait_for: "Enter another goal: "
+- name: evo_ninja
+  description: Research, analyse and build software
+  icon: https://evo.ninja/favicon.ico
+  vscode: true
+  git:
+    repo: https://github.com/polywrap/evo.ninja
+    branch: dev
+    baseDir: ~/.agents/evo.ninja
+  cli:
+    command: cmd.exe
+    args: ["/K", "yarn", "start"]
+    cwd: ~/.agents/evo.ninja
+    wait_for: "Enter another goal: "
 ```
 
 The example above downloads and installs the agent from source, pulling the latest changes on every launch.
@@ -118,16 +118,16 @@ The example above downloads and installs the agent from source, pulling the late
 
 All Agents automatically register themselves with the `AgentRegistry` upon construction.
 
-*Note*: Name your agents carefully - if an Agent attempts to send a message to another Agent by `role` (eg "developer") and an Agent exists with a **name** matching that role, it will receive the message.
+_Note_: Name your agents carefully - if an Agent attempts to send a message to another Agent by `role` (eg "developer") and an Agent exists with a **name** matching that role, it will receive the message.
 
 The RouterAgent and WorkflowManager use context fields to determine which Agent to route each user message to.
 
 For example, a request to "create a new react web app" may result in the following context fields being set:
 
-  - role: "developer", "tester" etc
-  - language: ["javascript", "typescript"]
-  - platform: ["web"]
-  - framework: ["react"]
+- role: "developer", "tester" etc
+- language: ["javascript", "typescript"]
+- platform: ["web"]
+- framework: ["react"]
 
 [AIConfig]: https://aiconfig.lastmileai.dev/
 [AutoGen]: https://github.com/microsoft/autogen

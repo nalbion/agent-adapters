@@ -10,7 +10,10 @@ export default class GitClient {
    * @param options
    * @example new GitClient('/path/to/workspace', { baseDir: '/path/to/workspace', config: ['user.name=John Doe' })
    */
-  constructor(private baseDir: string, options?: Partial<SimpleGitOptions>) {
+  constructor(
+    private baseDir: string,
+    options?: Partial<SimpleGitOptions>,
+  ) {
     if (options) {
       options.baseDir = baseDir;
     }

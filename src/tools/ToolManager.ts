@@ -31,7 +31,11 @@ export class ToolManager {
       .sort((a, b) => a[0].localeCompare(b[0]));
   }
 
-  static async executeTool(name: string, context: ToolContext, parameters: string | { [k: string]: unknown }): Promise<string | undefined | void> {
+  static async executeTool(
+    name: string,
+    context: ToolContext,
+    parameters: string | { [k: string]: unknown },
+  ): Promise<string | undefined | void> {
     const tool = this.tools[name];
     if (tool) {
       const parsedParams = typeof parameters === 'string' ? JSON.parse(parameters) : parameters;

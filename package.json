@@ -13,6 +13,7 @@
     "prepublishOnly": "npm run build",
     "lint": "eslint src --ext ts",
     "lint:fix": "eslint src --fix --ext ts",
+    "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
     "generate:agents-schema": "npx ts-json-schema-generator --unstable --no-top-ref --type AgentsYml --path src/types/AgentsYml.ts --out schemas/agents.yml.json"
   },
