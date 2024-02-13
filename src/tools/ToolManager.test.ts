@@ -12,7 +12,7 @@ describe('ToolManager', () => {
 
   beforeEach(() => {
     // Initialize your variables here
-    toolCallback = (context: ToolContext, param1: string, param2: string) => {
+    toolCallback = (_context: ToolContext, param1: string, param2: string) => {
       console.info('toolCallback', param1, param2);
       return `toolCallback ${param1} ${param2}`;
     };

@@ -8,7 +8,7 @@ const readOaiConfigList = async (name = OAI_CONFIG_LIST): Promise<ModelConfig[]>
   let configList = process.env[name];
   if (!configList) {
     try {
-      const oaiConfigList = await findFile(name, ['', '.json'], true);
+      const oaiConfigList = await findFile(name, ['', '.json']);
 
       configList = await fs.readFile(oaiConfigList, 'utf8');
     } catch (paths) {

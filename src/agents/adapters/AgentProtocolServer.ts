@@ -30,7 +30,7 @@ export default class AgentProtocolServer extends Agent {
     // apAgent.setArtifactStorage(ArtifactStorageFactory.create(agentConfig.server.artifactStorage));
   }
 
-  static async newTask(taskId: string, taskInput: TaskInput | null, additionalInput?: Record<string, any>) {
+  static async newTask(taskId: string, _taskInput: TaskInput | null, _additionalInput?: Record<string, any>) {
     const agent = AgentProtocolServer.instance;
 
     if (!agent) {

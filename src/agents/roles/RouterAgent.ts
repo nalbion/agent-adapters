@@ -150,7 +150,7 @@ export default class RouterAgent extends Agent {
     return systemMessage as string;
   }
 
-  protected routeAction(status: AgentResponseStatus): AgentResponseStatus {
+  protected routeAction(_status: AgentResponseStatus): AgentResponseStatus {
     // may need to push the agent onto a stack?
 
     // switch (status) {

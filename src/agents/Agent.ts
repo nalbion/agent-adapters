@@ -204,7 +204,7 @@ export default abstract class Agent {
    *     If full-stack and current focus is unknown:
    *  "You should focus on front-end first, build something to present to the client for feedback, validation & iteration.
    */
-  protected generateSystemPrompt(input: AgentInputMessage, context: AgentContext): string | undefined {
+  protected generateSystemPrompt(_input: AgentInputMessage, _context: AgentContext): string | undefined {
     return this.agentConfig.prompts?.find((p) => p.name === 'system')?.input as string;
   }
 

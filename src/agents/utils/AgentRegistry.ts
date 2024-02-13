@@ -130,7 +130,7 @@ export default class AgentRegistry {
               description:
                 'The agent to send the input to:\n' +
                 agents
-                  .map((agentConfig, i) => {
+                  .map((agentConfig) => {
                     const agent = AgentRegistry.agents[agentConfig.name];
                     return `- ${agentConfig.name}: ${agent.getDescriptionForRoutingLlm()}`;
                   })

@@ -16,7 +16,7 @@ export type LlmResponseMessage =
   | { role: 'tool'; tools: ChatCompletionMessageToolCall[] }
   | { role: 'assistant'; content: string };
 
-type ChatCompletionMessageToolCall = {
+export type ChatCompletionMessageToolCall = {
   // id: string;
   function: {
     name: string;

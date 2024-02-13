@@ -5,6 +5,7 @@ import { ChatCompletionTool } from '../../llm';
 import { Tool, ToolDefinition, ToolConfig, ToolCallback } from '../../tools';
 import { AgentConfig } from '../../types';
 import { createChatRequestOptions } from '../../types/ChatRequest';
+import { ChatCompletionMessageToolCall } from '../../llm/message';
 
 export default class OpenAiAgent extends Agent {
   private tools: { [name: string]: ToolConfig } = {};
@@ -48,7 +49,7 @@ export default class OpenAiAgent extends Agent {
       } else {
         const { tools } = llmResponse;
         const results = await Promise.all(
-          tools.map((tool: Tool) => {
+          tools.map((tool: ChatCompletionMessageToolCall) => {
             this.tools[tool.function.name].implementation.execute(context, JSON.parse(tool.function.arguments));
           }),
         );

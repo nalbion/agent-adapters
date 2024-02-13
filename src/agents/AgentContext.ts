@@ -103,7 +103,7 @@ export class AgentContext {
     },
   ) {}
 
-  public onProgress(progressData: ProgressData): void {}
+  public onProgress(_progressData: ProgressData): void {}
 
   public formatError(error: string): string {
     return error;

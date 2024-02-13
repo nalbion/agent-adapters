@@ -37,7 +37,7 @@ export function getAbsolutePathInWorkspace(workspaceFolder: string, filePath: st
  *                Example: ['.yml', '.yaml']
  * @returns The path to the found file. Will include path if not in the current directory.
  */
-export const findFile = async (name: string, extensions?: string[], debug = false): Promise<string> => {
+export const findFile = async (name: string, extensions?: string[]): Promise<string> => {
   // Build a list of path variants
   const inHomeDir = path.join(os.homedir(), name);
   const inAgentsDir = path.join(os.homedir(), '.agents', name);

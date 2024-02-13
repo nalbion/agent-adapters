@@ -68,6 +68,7 @@ export const openAiChatRequest = async (
         if (content) {
           return assistantResponse(content);
         }
+        break;
       case 'tool_calls':
         const tools = completion.choices[0].message.tool_calls;
         if (tools) {
