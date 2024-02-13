@@ -37,8 +37,8 @@ export class ToolManager {
       const parsedParams = typeof parameters === 'string' ? JSON.parse(parameters) : parameters;
       const values = Object.values(parsedParams);
       return await tool.implementation.execute(context, ...values);
-    } else {
-      logger.warn(`Tool ${name} not found in ToolManager.tools. parameters: ${JSON.stringify(parameters)}`);
     }
+    logger.warn(`Tool ${name} not found in ToolManager.tools. parameters: ${JSON.stringify(parameters)}`);
+    return undefined;
   }
 }
