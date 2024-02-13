@@ -10,4 +10,4 @@ export type ToolConfig = {
   implementation: Tool;
 };
 
-export type ToolCallback = (context: ToolContext, ...parameters: any) => undefined | string | Promise<string | undefined>;
+export type ToolCallback = (context: ToolContext, ...parameters: any) => string | undefined | void | Promise<string | undefined>;
