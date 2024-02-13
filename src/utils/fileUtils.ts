@@ -16,17 +16,23 @@ export function normalisePath(filePath: string | undefined) {
 }
 
 export function getAbsolutePathInWorkspace(workspaceFolder: string, filePath: string): string {
+  console.info('filepath 1:', filePath);
   filePath = filePath.replaceAll('\\', '/').replaceAll('../', '');
+  console.info('filepath 2:', filePath);
 
   if (filePath.startsWith('~')) {
     filePath = 'home/' + filePath.substring(1);
   } else if (filePath.startsWith('/')) {
     filePath = 'root' + filePath;
   } else {
+    console.info('filepath 3:', filePath);
     filePath = filePath.replace(/^[A-Za-z]:/, 'root');
   }
 
+  console.info('filepath 4:', filePath);
+  console.info('workspaceFolder:', workspaceFolder);
   let absolutePath = path.resolve(workspaceFolder, filePath);
+  console.info('absolutePath:', absolutePath);
 
   return absolutePath;
 }
