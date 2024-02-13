@@ -2,8 +2,20 @@
   "name": "agent-adapters",
   "version": "1.0.0",
   "description": "Configurable AI Agents",
+  "license": "MPL-2.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "keywords": [
+    "AI Agents",
+    "Open AI",
+    "AutoGen",
+    "AIConfig",
+    "Agent Protocol",
+    "LLM",
+    "AutoGPT",
+    "TypeScript",
+    "Node"
+  ],
   "scripts": {
     "pretest": "npm run build && npm run lint",
     "test": "jest",
@@ -21,12 +33,10 @@
     "type": "git",
     "url": "git+https://github.com/nalbion/agent-adapters.git"
   },
-  "keywords": [],
   "author": {
     "name": "Nicholas Albion",
     "email": "nalbion@yahoo.com"
   },
-  "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/nalbion/agent-adapters/issues"
   },

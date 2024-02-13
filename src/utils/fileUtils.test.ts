@@ -40,6 +40,7 @@ describe('getAbsolutePathInWorkspace', () => {
       const result = getAbsolutePathInWorkspace(workspace, file);
 
       // Then
+      console.info('result:', result);
       expect(result.replaceAll('\\', '/').replace(/^[A-Z]:/, '')).toBe(expected);
     });
   });
