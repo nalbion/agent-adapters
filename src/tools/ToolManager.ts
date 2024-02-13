@@ -31,12 +31,12 @@ export class ToolManager {
       .sort((a, b) => a[0].localeCompare(b[0]));
   }
 
-  static executeTool(name: string, context: ToolContext, parameters: string | { [k: string]: unknown }): void {
+  static async executeTool(name: string, context: ToolContext, parameters: string | { [k: string]: unknown }): Promise<string | undefined> {
     const tool = this.tools[name];
     if (tool) {
       const parsedParams = typeof parameters === 'string' ? JSON.parse(parameters) : parameters;
       const values = Object.values(parsedParams);
-      tool.implementation.execute(context, ...values);
+      return await tool.implementation.execute(context, ...values);
     } else {
       logger.warn(`Tool ${name} not found in ToolManager.tools. parameters: ${JSON.stringify(parameters)}`);
     }
