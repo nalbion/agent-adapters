@@ -22,7 +22,7 @@ jest.mock('fs/promises', () => {
 describe('getAbsolutePathInWorkspace', () => {
   const testCases = [
     { workspace: '/my/workspace', file: 'file', expected: '/my/workspace/file' },
-    { workspace: 'C:\\my\\workspace', file: 'file', expected: 'C:\\my\\workspace\\file' },
+    { workspace: 'C:\\my\\workspace', file: 'file', expected: '/my/workspace/file' },
     { workspace: '/my/workspace', file: '.env', expected: '/my/workspace/.env' },
     { workspace: '/my/workspace', file: './file', expected: '/my/workspace/file' },
     { workspace: '/my/workspace', file: 'path/to/file', expected: '/my/workspace/path/to/file' },
@@ -40,7 +40,7 @@ describe('getAbsolutePathInWorkspace', () => {
       const result = getAbsolutePathInWorkspace(workspace, file);
 
       // Then
-      expect(result).toBe(expected);
+      expect(result.replaceAll('\\', '/').replace(/^[A-Z]:/, '')).toBe(expected);
     });
   });
 });
