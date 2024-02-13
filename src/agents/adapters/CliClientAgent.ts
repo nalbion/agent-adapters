@@ -64,7 +64,14 @@ export default class CliClientAgent extends Agent {
 
   protected prepareArgs(input: AgentInputMessage, context: AgentContext): string[] {
     // Send the input message as an argument to the script
-    const args: string[] = typeof input.content === 'string' ? [`"${input.content}"`] : [JSON.stringify(input.content)];
+    if (typeof input.content === 'string') {
+      if (input.content.includes(' ')) {
+        input.content = `"${input.content}"`;
+      }
+    } else {
+      input.content = JSON.stringify(input.content);
+    }
+    const args: string[] = [input.content];
     logger.info('prepareArgs: input.content:', input.content);
     logger.info('prepareArgs: args:', JSON.stringify(args));
 
