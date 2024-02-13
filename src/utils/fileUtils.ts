@@ -23,8 +23,9 @@ export function getAbsolutePathInWorkspace(workspaceFolder: string, filePath: st
   } else if (filePath.startsWith('/')) {
     filePath = 'root' + filePath;
   } else {
-    filePath = filePath.replace(/^[^:]+:/, 'root');
+    filePath = filePath.replace(/^[A-Za-z]:/, 'root');
   }
+  
   let absolutePath = path.resolve(workspaceFolder, filePath);
 
   return absolutePath;
