@@ -1,0 +1,30 @@
+config_list:
+  - model: gpt-4
+    api_key: YOUR_API_KEY
+  - model: gpt-3.5-turbo
+    api_key: YOUR_API_KEY
+
+agents:
+  - name: my-agent
+    description: Uses OpenAI's GPT-4 LLM
+    vscode: true
+    models: ["gpt-4"]
+    prompts:
+      - name: background
+        input: You are a helpful assistant
+    routing:
+      roles:
+        - developer
+
+  - name: evo_ninja
+    description: Research, analyse and build software
+    vscode: true
+    git:
+      repo: https://github.com/polywrap/evo.ninja
+      branch: dev
+      baseDir: ~/.agents/evo.ninja
+    cli:
+      command: cmd.exe
+      args: ["/K", "yarn", "start"]
+      cwd: ~/.agents/evo.ninja
+      wait_for: "Enter another goal: "

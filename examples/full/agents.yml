@@ -1,0 +1,81 @@
+config_list:
+  - model: gpt-4
+    api_key: YOUR_API_KEY
+  - model: gpt-3.5-turbo
+    api_key: YOUR_API_KEY
+
+agents:
+  - name: 10xDeveloper
+    description: An experienced software developer
+    # /agents/[]/metadata/models is an AIConfig convention (https://aiconfig.lastmileai.dev)
+    metadata:
+      default_model: default
+      models:
+        default:
+          model: gpt-4
+          temperature: 0.5
+        fast:
+          model: gpt-3.5-turbo
+          temperature: 0.3
+
+    # /agents/[]/models can be used to filter the OAI_CONFIG_LIST model configs in /config_list
+    models: ["gpt-4"]
+
+    # /agents/[]/llm_config is used at runtime, but if not provided can be generated on initialisation
+    # from /config_list, /agents/[]/models and/or /agents/[]/metadata/models
+    llm_config:
+      config_list:
+        - model: gpt-4
+          api_key: YOUR_API_KEY
+      model_settings:
+        default:
+          model: gpt-4
+          temperature: 0.5
+
+    # Should the agent be available in the VSCode extension
+    vscode: true
+    # Fields used by the RouterAgent to determine which agent to use
+    routing:
+      roles: ["developer"]
+      context:
+        languages: ["c++", "python", "javascript", "java", "c#"]
+    prompts:
+      - name: "background"
+        input: |
+          You are an experienced software engineer who practices TDD and CI/CD.
+          You are familiar with the following:
+           - languages: C++, Python, JavaScript, Java, and C#.
+           - frameworks: React, Angular, Vue, Django, Flask, Spring, and .NET.
+           - databases: MySQL, PostgreSQL, MongoDB, and Redis.
+           - cloud platforms: AWS, Azure, and GCP.
+           - CI/CD tools: Jenkins, CircleCI, and TravisCI.
+           - containerization tools: Docker and Kubernetes.
+
+  - name: router
+    description: A router agent
+    vscode: true
+    models: ["gpt-4"]
+    routing:
+      team: ["10xDeveloper", "python_demo"]
+
+  - name: scrum
+    description: My AI scrum team
+    vscode: true
+    workflow_base_path: ~/.agents/workflows/scrum
+
+  - name: command_line
+    description: Talk to the command line
+    vscode: true
+    cli:
+      command: cmd.exe
+      args: ["/K"] # /K keeps the process open
+      # args: ["/C"] # /C closes the process after execution
+      # daemon: true
+
+  - name: python_demo
+    description: Python CLI client demo
+    vscode: true
+    cli:
+      # command: %HOME_PATH%\.pyenv\pyenv-win\shims\python
+      command: python
+      args: ["../AutoGen_Agent_Demo/agents/demo.py"]
