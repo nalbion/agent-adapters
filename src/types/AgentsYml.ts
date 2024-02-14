@@ -1,5 +1,6 @@
 /* eslint-disable */
 
+import { FileStorageConfig } from 'any-cloud-storage';
 import { AIConfigRootMetadata, AiConfigPrompt, ModelSettings } from './AIConfig';
 
 /**
@@ -100,6 +101,9 @@ export interface AgentConfig {
     port?: number;
     /** @default './workspace' */
     workspace?: string;
+
+    /** By default, files will be saved to disk, but serverless agents can use alternatives using `any-cloud-storage` */
+    storage?: FileStorageConfig;
   };
 
   /**

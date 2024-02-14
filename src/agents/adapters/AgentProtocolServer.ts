@@ -9,6 +9,17 @@ import { AgentConfig } from '../../types';
 
 type AgentConfigWithRequiredServer = Required<Pick<AgentConfig, 'server'>> & Partial<Omit<AgentConfig, 'server'>>;
 
+/**
+ * Runs as a singleton service, listening for Agent Protocol requests.
+ *
+ * If `config.server.port` is provided, it will start a server to listen for incoming requests.
+ * Otherwise, serverless Agents need to manually call `createServerless` and provide to the Serverless provider.
+ *
+ * @see ./firebase, google-cloud, lambda
+ * @see https://github.com/AI-Engineer-Foundation/agent-protocol/pull/99
+ * @see https://github.com/AI-Engineer-Foundation/agent-protocol/pull/103
+ * @see https://github.com/AI-Engineer-Foundation/agent-protocol/pull/104
+ */
 export default class AgentProtocolServer extends Agent {
   private static instance: AgentProtocolServer | undefined;
   private taskContexts: Map<string, AgentProtocolContext> = new Map();

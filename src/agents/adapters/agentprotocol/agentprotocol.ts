@@ -2,6 +2,7 @@ import Agent, { type StepHandler, type StepInput, type StepResult, type TaskInpu
 import AgentProtocolServer from '../AgentProtocolServer';
 import { logger } from '../../../utils/Logger';
 import { AgentResponseStatus } from '../../types/AgentResponse';
+import { FileStorage } from 'any-cloud-storage';
 
 /**
  * Handles incoming requests: POST /ap/v1/agent/task
@@ -37,13 +38,36 @@ export const startServer = (config: { port?: number; workspace?: string }) => {
   apAgent.start();
 };
 
-export const createServerless = (config: {
+type ServerRequestHandler<R, S> = (request: R, response: S) => void | Promise<void>;
+type BuildServerConfig = {
+  workspace?: string;
   // Waiting on https://github.com/AI-Engineer-Foundation/agent-protocol/pull/100
   // artifactStorage: ArtifactStorage;
-}) => {
+};
+
+const buildServer = (config: BuildServerConfig) => {
   apAgent = Agent.handleTask(taskHandler, config);
   // Waiting on https://github.com/AI-Engineer-Foundation/agent-protocol/pull/99
-  // return agent.build();
+  const apHandler = (apAgent as any).build() as ServerRequestHandler<R, S>; // the Express app
+  apAgent.start();
+  return apHandler;
+};
+
+export const createServerless = <R = Request, S = Response>(
+  config: BuildServerConfig,
+  promisedStorage?: Promise<FileStorage>,
+) => {
+  if (promisedStorage) {
+    const promisedHandler = promisedStorage.then((storage) => {
+      // config.artifactStorage = ArtifactStorageFactory.create(config.artifactStorage);
+      // config.artifactStorage = new AnyCloudArtifactStorage(storage);
+      return buildServer(config);
+    });
+
+    return (request: R, response: S) => promisedHandler.then((handler) => handler(request, response));
+  }
+
+  return buildServer(config);
 };
 
 // type Artifact = {

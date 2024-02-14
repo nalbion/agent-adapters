@@ -1,6 +1,6 @@
 {
   "name": "agent-adapters",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Configurable AI Agents",
   "license": "MPL-2.0",
   "main": "dist/index.js",
@@ -41,9 +41,16 @@
     "url": "https://github.com/nalbion/agent-adapters/issues"
   },
   "homepage": "https://github.com/nalbion/agent-adapters#readme",
+  "files": [
+    "dist/",
+    "README.md",
+    "package.json",
+    "LICENSE.txt"
+  ],
   "dependencies": {
     "ajv": "^8.12.0",
     "ajv-formats": "^2.1.1",
+    "any-cloud-storage": "^1.0.3",
     "js-yaml": "^4.1.0",
     "rimraf": "^5.0.5",
     "yaml-ast-parser": "^0.0.43"
