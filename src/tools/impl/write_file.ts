@@ -1,6 +1,5 @@
-import path from 'path';
 import { ToolManager } from '../ToolManager';
-import { ToolContext } from '../tool_types';
+import { ToolContext } from '../ToolTypes';
 import { getAbsolutePathInWorkspace } from '../../utils/fileUtils';
 import { fileStorage } from '../../utils/fileStorage';
 
