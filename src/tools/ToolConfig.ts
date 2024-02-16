@@ -1,7 +1,8 @@
-import { FunctionDefinition } from '../llm';
-import { Tool } from './Tool';
+import { type Tool } from './Tool';
+import { ToolDefinition } from './ToolTypes';
 
 export type ToolConfig = {
-  definition: FunctionDefinition;
+  // As per Open AI function calling / Tool definition
+  definition: ToolDefinition;
   implementation: Tool;
 };

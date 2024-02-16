@@ -7,7 +7,7 @@ import { AgentResponse, AgentResponseStatus, AgentInputMessage } from '../types'
 import { AgentConfig } from '../../types';
 import { ToolManager } from '../../tools/ToolManager';
 import { TOOL_EXECUTE_PYTHON_CODE, TOOL_WRITE_FILE } from '../../tools/impl';
-import { TOOL_EXECUTE_SHELL } from '../../utils/dockerUtils';
+import { TOOL_EXECUTE_SHELL } from '../../tools/impl/execute_shell';
 
 export default class AgentProtocolClient extends Agent {
   private hostUrl: string;
@@ -36,7 +36,11 @@ export default class AgentProtocolClient extends Agent {
     const { command } = step.additional_output || {};
     if (command) {
       // TODO: ask_user(question: string)
-      ToolManager.executeTool(command.name, context, command.args);
+      const toolResult = await ToolManager.executeTool(command.name, context, command.args);
+      context.onProgress({
+        type: 'content',
+        content: `Executed tool: ${command.name}(${command.args}) with result: ${toolResult}`,
+      });
     }
 
     // status: 'completed'

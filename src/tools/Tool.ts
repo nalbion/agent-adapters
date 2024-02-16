@@ -1,6 +1,5 @@
-import { ToolCallback } from './tool_types';
 import { ChatCompletionTool } from '../llm/tools';
-import { ToolDefinition } from './ToolDefinition';
+import { ToolCallback, ToolDefinition } from './ToolTypes';
 
 export class Tool {
   id: string;

@@ -1,5 +1,5 @@
 import { ToolManager } from '../ToolManager';
-import { ToolContext } from '../tool_types';
+import { ToolContext } from '../ToolTypes';
 import { logger } from '../../utils/Logger';
 
 export const TOOL_EXECUTE_PYTHON_CODE = 'execute_python_code';
@@ -8,8 +8,8 @@ export const TOOL_EXECUTE_PYTHON_FILE = 'execute_python_file';
 import path from 'path';
 import { runInDocker } from '../../utils/dockerUtils';
 
-const runPythonInDocker = async (context: ToolContext, ...args: string[]) => {
-  return runInDocker(context, 'python:latest', 'python', ...args);
+const runPythonInDocker = async (context: ToolContext, args: string[]) => {
+  return runInDocker(context, 'python:latest', { Cmd: ['python'] }, args);
 };
 
 /**
@@ -19,7 +19,7 @@ const execute_python_code = async (context: ToolContext, code: string) => {
   let content;
   try {
     logger.info('Executing Python code:', code);
-    const result = await runPythonInDocker(context, '-c', `"${code}"`);
+    const result = await runPythonInDocker(context, ['-c', `"${code}"`]);
     content = 'Executed Python code: \n```' + result + '\n```';
 
     context.onProgress({ type: 'content', content });
@@ -58,7 +58,7 @@ const executePythonFile = async (context: ToolContext, filename: string, args: s
   } else {
     // Execute the Python file
     try {
-      content = await runPythonInDocker(context, filename, ...args);
+      content = await runPythonInDocker(context, [filename, ...args]);
     } catch (error) {
       content = `Error executing Python file: ${(error as Error).message}`;
     }

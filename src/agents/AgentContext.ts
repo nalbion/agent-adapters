@@ -1,3 +1,4 @@
+import { ToolContext } from '../tools/ToolTypes';
 import { logger } from '../utils';
 
 interface Disposable {
@@ -85,7 +86,7 @@ export type ProgressData =
 
 export type RoutingContext = Record<string, string | string[]>;
 
-export class AgentContext {
+export class AgentContext implements ToolContext {
   routing: RoutingContext = {};
 
   constructor(

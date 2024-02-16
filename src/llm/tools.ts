@@ -1,13 +1,9 @@
+import { ToolDefinition } from '../tools';
+
 export interface ChatCompletionTool {
   type: 'function';
-  function: FunctionDefinition;
+  function: ToolDefinition;
 }
-
-export type FunctionDefinition = {
-  name: string;
-  description: string;
-  parameters: Record<string, unknown>;
-};
 
 export type ChatCompletionToolChoiceOption =
   | 'none'

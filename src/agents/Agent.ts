@@ -248,7 +248,7 @@ export default abstract class Agent {
     }
 
     logger.info(`Agent ${this.name} executeInternalTool ${name} with parameters:`, parameters);
-    tool.execute(context, ...parameters);
+    return tool.execute(context, ...parameters);
   }
 
   addRole(role: string, agentConfig: AgentConfig) {

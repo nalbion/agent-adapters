@@ -1,4 +1,4 @@
-import { ToolDefinition } from '../../tools/ToolDefinition';
+import { ToolDefinition } from '../../tools/ToolTypes';
 import { ModelSettings } from '../../types/AIConfig';
 import { SlashCommand } from '../../types/AgentsYml';
 
