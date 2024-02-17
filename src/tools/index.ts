@@ -1,3 +1,3 @@
 export { ToolManager } from './ToolManager';
 export { Tool } from './Tool';
-export { ToolDefinition, ToolCallback } from './ToolTypes';
+export { ToolContext, ToolDefinition, ToolCallback } from './ToolTypes';

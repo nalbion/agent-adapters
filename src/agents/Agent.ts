@@ -60,6 +60,10 @@ export default abstract class Agent {
     AgentRegistry.registerAgent(agentConfig, this);
   }
 
+  toString() {
+    return this.name;
+  }
+
   addDisposeListener(callback: () => void) {
     this.disposeListeners.push(callback);
   }
@@ -103,10 +107,6 @@ export default abstract class Agent {
 
   getRoles(): string[] {
     return this.agentConfig.routing?.roles || [];
-  }
-
-  toString() {
-    return this.name;
   }
 
   /**
@@ -194,6 +194,16 @@ export default abstract class Agent {
     context: AgentContext,
   ): Promise<AgentResponse | undefined> | undefined {
     return this.workflowManager?.processUserRequest(input, context, this);
+  }
+
+  protected areStepRequirementsSatisified(_stepId: string, _context: AgentContext): boolean {
+    // TODO: workflowManager?.areStepRequirementsSatisified(input, context);
+    return true;
+  }
+
+  protected async executeStep(_stepId: string, _input: AgentInputMessage, _context: AgentContext): Promise<AgentResponse | undefined> {
+    // TODO: return this.workflowManager?.executeStep(input, context);
+    return undefined;
   }
 
   /**
