@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { AgentContext, logger } from '..';
+import Handlebars, { compile } from 'handlebars';
 
 export const getPromptFromFile = async (filePath: string, context: AgentContext): Promise<string | undefined> => {
   const absolutePath = path.resolve(filePath);
@@ -13,12 +14,8 @@ export const getPromptFromFile = async (filePath: string, context: AgentContext)
   return replacePlaceholders(template, context);
 };
 
-function replacePlaceholders(template: string, context: AgentContext): string {
-  return template.replace(/{([^}]+)}/g, (_match, key: string) => {
-    key = key.trim();
-
-    const value = key === 'directory_tree' ? context.getDirectoryTree() : context.routing[key];
-
-    return value !== undefined ? String(value) : '';
-  });
+function replacePlaceholders(templateStr: string, context: AgentContext): string {
+  Handlebars.registerHelper('directory_tree', context.getDirectoryTree);
+  const template = compile(templateStr);
+  return template(context);
 }

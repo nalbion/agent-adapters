@@ -17,7 +17,7 @@ const read_file = async (context: ToolContext, filename: string, encoding?: Buff
 
   context.onProgress({
     type: 'inlineContentReference',
-    title: `Agent called \`read_file('${filePath}')\``,
+    title: `Agent called \`read_file('${filePath}')\`\n\n`,
     inlineReference: filePath,
   });
 
