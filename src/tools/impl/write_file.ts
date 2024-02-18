@@ -17,7 +17,7 @@ const write_file = async (context: ToolContext, filename: string, contents: stri
 
   context.onProgress({
     type: 'inlineContentReference',
-    title: `write_file(${filename})\n\n`,
+    title: `\nwrite_file(${filename})\n`,
     inlineReference: filePath,
   });
 };
