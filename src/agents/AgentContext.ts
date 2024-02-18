@@ -1,4 +1,5 @@
 import { ToolContext } from '../tools/ToolTypes';
+import { get_directory_tree } from '../tools/impl/get_directory_tree';
 import { logger } from '../utils';
 
 interface Disposable {
@@ -84,7 +85,8 @@ export type ProgressData =
       command: string;
     };
 
-export type RoutingContext = Record<string, string | string[]>;
+export type RoutingContextValue = string | string[] | { [key: string]: RoutingContextValue };
+export type RoutingContext = Record<string, RoutingContextValue>;
 
 export class AgentContext implements ToolContext {
   routing: RoutingContext = {};
@@ -110,13 +112,25 @@ export class AgentContext implements ToolContext {
     return error;
   }
 
+  public getDirectoryTree(): string {
+    return get_directory_tree(this.workspaceFolder);
+  }
+
   mergeRoutingContext(delta: RoutingContext) {
     const mergedContext = { ...this.routing };
 
     Object.keys(delta).forEach((key) => {
       if (mergedContext.hasOwnProperty(key)) {
         // Merge arrays and remove duplicates
-        mergedContext[key] = Array.from(new Set([...mergedContext[key], ...delta[key]]));
+        const mergedValue = mergedContext[key];
+        const deltaValue = delta[key];
+        if (Array.isArray(mergedValue) && Array.isArray(deltaValue)) {
+          mergedContext[key] = Array.from(new Set([...mergedValue, ...deltaValue]));
+        } else if (typeof mergedValue === 'object' && typeof deltaValue === 'object') {
+          mergedContext[key] = { ...mergedValue, ...deltaValue };
+        } else {
+          mergedContext[key] = deltaValue;
+        }
       } else {
         // Add new key and value
         mergedContext[key] = delta[key];

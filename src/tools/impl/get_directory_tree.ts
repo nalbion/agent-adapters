@@ -97,17 +97,21 @@ function shouldIgnoreFile(filePath: string): boolean {
   return path.basename(filePath).startsWith('.') || ignorePaths.includes(path.basename(filePath));
 }
 
-ToolManager.registerTool((context: ToolContext, path: string) => get_directory_tree(context.workspaceFolder, path), {
-  name: TOOL_GET_DIRECTORY_TREE,
-  description: 'Provides a directory listing in a tree format',
-  parameters: {
-    type: 'object',
-    properties: {
-      path: {
-        type: 'string',
-        description: 'The root path to start the directory listing',
+ToolManager.registerTool(
+  (context: ToolContext, directoryPath?: string) =>
+    get_directory_tree(directoryPath ? path.join(context.workspaceFolder, directoryPath) : context.workspaceFolder),
+  {
+    name: TOOL_GET_DIRECTORY_TREE,
+    description: 'Provides a directory listing in a tree format',
+    parameters: {
+      type: 'object',
+      properties: {
+        path: {
+          type: 'string',
+          description: 'The root path to start the directory listing. Defaults to the project root.',
+        },
       },
+      // required: ['path'],
     },
-    required: ['path'],
   },
-});
+);

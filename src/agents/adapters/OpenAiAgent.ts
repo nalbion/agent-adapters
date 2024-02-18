@@ -10,8 +10,8 @@ import { ToolConfig } from '../../tools/ToolConfig';
 export default class OpenAiAgent extends Agent {
   private tools: { [name: string]: ToolConfig } = {};
 
-  constructor(agentConfig: AgentConfig) {
-    super(agentConfig);
+  constructor(agentConfig: AgentConfig, role?: string, promptsDir?: string) {
+    super(agentConfig, role, promptsDir);
   }
 
   registerTool(callback: ToolCallback, definition: ToolDefinition) {
@@ -21,13 +21,13 @@ export default class OpenAiAgent extends Agent {
     };
   }
 
-  override async processUserRequest(input: AgentInputMessage, context: AgentContext): Promise<AgentResponse> {
+  protected override async processUserRequest(input: AgentInputMessage, context: AgentContext): Promise<AgentResponse> {
     let response = await super.processUserRequest(input, context);
 
     if (!response) {
       // async sendMessage(input: AgentInputMessage): Promise<AgentResponse> {
       console.info('OpenAiAgent.receiveMessage', input.content);
-      const messages = agentMessageToLlmMessages(input, this.generateSystemPrompt(input, context));
+      const messages = agentMessageToLlmMessages(input, await this.generateSystemPrompt(context));
 
       const tools = Object.values(this.tools);
       const options = createChatRequestOptions(context.cancellation, {

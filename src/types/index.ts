@@ -1,4 +1,4 @@
-export { AgentsYml, AgentConfig, ModelConfig, SlashCommand } from './AgentsYml';
+export { AgentsYml, AgentConfig, ModelConfig, SlashCommand, AgentGitConfig } from './AgentsYml';
 export {
   ChatRequestOptions,
   ChatRequestOptionsWithOptionalModelConfig,

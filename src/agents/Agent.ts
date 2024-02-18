@@ -1,8 +1,11 @@
+import path from 'path';
 import AgentRegistry, { AgentSearchOpts } from './utils/AgentRegistry';
 import { WorkflowManager, createWorkflowManager } from './workflow/WorkflowManager';
 import { AgentContext, ProgressData, RoutingContext } from './AgentContext';
 import { AgentResponse, AgentResponseStatus } from './types/AgentResponse';
 import { AgentInputMessage } from './types/AgentMessage';
+import { StepRequirement } from './workflow/WorkflowSchema';
+import { areRequirementsMet } from './workflow';
 
 import { LlmRequestMessage, LlmResponseMessage, sendChatRequest } from '../llm';
 import { ModelManager } from '../models';
@@ -10,7 +13,7 @@ import { AgentConfig, ModelConfig } from '../types';
 import { ToolManager } from '../tools';
 import { SlashCommand } from '../types/AgentsYml';
 import { ChatRequestOptions, ChatRequestOptionsWithOptionalModelConfig } from '../types/ChatRequest';
-import { logger, normalisePath } from '../utils';
+import { getPromptFromFile, logger, normalisePath } from '../utils';
 import { normaliseRoutingContext } from '../utils/routingContext';
 
 export const INSTALLATION_COMMAND = 'installation';
@@ -48,6 +51,7 @@ export default abstract class Agent {
   constructor(
     protected agentConfig: AgentConfig,
     role?: string,
+    protected promptsDir = `~/.agents/prompts`,
   ) {
     this.name = agentConfig.name;
 
@@ -153,6 +157,9 @@ export default abstract class Agent {
     // TODO: use fallbacks?
   }
 
+  // /** Called when a new AgentContext is created, allows an agent to insert it's own context values */
+  // initialiseContext(_context: AgentContext) {}
+
   /**
    * Receive a message from another Agent and respond to it.
    * Subclasses should override `processUserRequest()` if they want to be able to use the WorkflowManager.
@@ -189,19 +196,56 @@ export default abstract class Agent {
    * @param context The Agent's context
    * @returns A response to the user, or undefined  TODO - or AgentResponse?
    */
-  protected processUserRequest(
+  protected async processUserRequest(
     input: AgentInputMessage,
     context: AgentContext,
-  ): Promise<AgentResponse | undefined> | undefined {
-    return this.workflowManager?.processUserRequest(input, context, this);
+  ): Promise<AgentResponse | undefined> {
+    let response: AgentResponse | undefined;
+
+    let nextStep = this.getNextStepName(input, context);
+    if (nextStep) {
+      response = await this.executeStep(nextStep, input, context);
+    }
+
+    if (!response) {
+      response = await this.workflowManager?.processUserRequest(input, context, this);
+    }
+
+    return response;
   }
 
-  protected areStepRequirementsSatisified(_stepId: string, _context: AgentContext): boolean {
-    // TODO: workflowManager?.areStepRequirementsSatisified(input, context);
+  protected stepRequirements: { [stepName: string]: StepRequirement[] } = {};
+
+  protected areStepRequirementsMet(stepName: string, context: AgentContext): boolean {
+    const requirements = this.stepRequirements[stepName];
+    if (requirements) {
+      return areRequirementsMet(context.routing, requirements);
+    }
     return true;
   }
 
-  protected async executeStep(_stepId: string, _input: AgentInputMessage, _context: AgentContext): Promise<AgentResponse | undefined> {
+  protected getNextStepName(input: AgentInputMessage, context: AgentContext): string | undefined {
+    let nextStep = input.command;
+
+    if (!nextStep || !this.areStepRequirementsMet(nextStep, context)) {
+      // TODO: workflowManager?.getNextStepName(input, context);
+
+      for (const stepName in this.stepRequirements) {
+        if (this.areStepRequirementsMet(stepName, context)) {
+          nextStep = stepName;
+          break;
+        }
+      }
+    }
+
+    return nextStep;
+  }
+
+  protected async executeStep(
+    _stepName: string,
+    _input: AgentInputMessage,
+    _context: AgentContext,
+  ): Promise<AgentResponse | undefined> {
     // TODO: return this.workflowManager?.executeStep(input, context);
     return undefined;
   }
@@ -214,8 +258,12 @@ export default abstract class Agent {
    *     If full-stack and current focus is unknown:
    *  "You should focus on front-end first, build something to present to the client for feedback, validation & iteration.
    */
-  protected generateSystemPrompt(_input: AgentInputMessage, _context: AgentContext): string | undefined {
+  protected generateSystemPrompt(_context: AgentContext): string | undefined | Promise<string | undefined> {
     return this.agentConfig.prompts?.find((p) => p.name === 'system')?.input as string;
+  }
+
+  protected getPromptFromFile(promptName: string, context: AgentContext): Promise<string | undefined> {
+    return getPromptFromFile(path.join(this.promptsDir, promptName + '.txt'), context);
   }
 
   /**
