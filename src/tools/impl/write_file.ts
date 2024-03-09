@@ -2,6 +2,7 @@ import { ToolManager } from '../ToolManager';
 import { ToolContext } from '../ToolTypes';
 import { getAbsolutePathInWorkspace } from '../../utils/fileUtils';
 import { fileStorage } from '../../utils/fileStorage';
+import path from 'path';
 
 export const TOOL_WRITE_FILE = 'write_file';
 
@@ -17,7 +18,7 @@ const write_file = async (context: ToolContext, filename: string, contents: stri
 
   context.onProgress({
     type: 'inlineContentReference',
-    title: `\nwrite_file(${filename})\n`,
+    title: `write_file(${path.basename(filename)})`,
     inlineReference: filePath,
   });
 };

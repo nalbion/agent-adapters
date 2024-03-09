@@ -2,6 +2,7 @@ import { ToolManager } from '../ToolManager';
 import { ToolContext } from '../ToolTypes';
 import { getAbsolutePathInWorkspace } from '../../utils/fileUtils';
 import { fileStorage } from '../../utils/fileStorage';
+import path from 'path';
 
 export const TOOL_READ_FILE = 'read_file';
 export const TOOL_READ_FILES = 'read_files';
@@ -17,7 +18,7 @@ const read_file = async (context: ToolContext, filename: string, encoding?: Buff
 
   context.onProgress({
     type: 'inlineContentReference',
-    title: `\nAgent called \`read_file('${filePath}')\`\n`,
+    title: `read_file('${path.basename(filePath)}')`,
     inlineReference: filePath,
   });
 
