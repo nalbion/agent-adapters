@@ -1,6 +1,6 @@
 {
   "name": "agent-adapters",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Configurable AI Agents",
   "license": "MPL-2.0",
   "main": "dist/index.js",
@@ -42,7 +42,9 @@
   },
   "homepage": "https://github.com/nalbion/agent-adapters#readme",
   "files": [
-    "dist/",
+    "dist/**/*.d.ts",
+    "dist/**/*.js",
+    "schemas/agents.yml.json",
     "README.md",
     "package.json",
     "LICENSE.txt"
