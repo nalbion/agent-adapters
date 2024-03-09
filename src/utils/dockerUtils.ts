@@ -1,11 +1,9 @@
-import Dockerode from 'dockerode';
+import Dockerode, { ContainerCreateOptions } from 'dockerode';
 import { logger } from './Logger';
-import { execSync } from 'child_process';
 import { statSync } from 'fs';
-import { ToolContext } from '../tools/tool_types';
-import { ToolManager } from '../tools/ToolManager';
-
-export const TOOL_EXECUTE_SHELL = 'execute_shell';
+import { ToolContext } from '../tools/ToolTypes';
+import { executeShell } from '../tools/impl/execute_shell';
+import { Writable } from 'stream';
 
 export const isRunningInDocker = (): boolean => {
   const result = statSync('/.dockerenv', { throwIfNoEntry: false });
@@ -19,23 +17,40 @@ export const isRunningInDocker = (): boolean => {
   // }
 };
 
-export const runInDocker = async (context: ToolContext, image: string, ...args: string[]): Promise<string> => {
+const docker = new Dockerode();
+
+/**
+ * @param context provies `workspaceFolder` and `askForUserPermission()`
+ * @param image eg 'python:3.8'
+ * @param containerCreateOpts eg `{ Cmd: ['python', '-c', 'print("Hello World")'], HostConfig: { Binds: [`${workspaceFolder}:/workspace`] } }`
+ * @param args Provide `args` if you want to override `containerCreateOpts.Cmd` when running directly from within a container or in the local shell.
+ * @returns
+ */
+export const runInDocker = async (
+  context: ToolContext,
+  image: string,
+  containerCreateOpts: ContainerCreateOptions,
+  args?: string[],
+  stderr: boolean = false,
+  follow: boolean = false,
+): Promise<string> => {
   if (isRunningInDocker()) {
-    return executeShell(context, true, ...args);
+    return executeShell(context, true, args || containerCreateOpts.Cmd!);
   }
 
-  let result;
+  let result: string;
   let container;
   const workspaceFolder = context.workspaceFolder;
 
   try {
-    logger.info(`Exectute in Docker ${image}: ${args.join(' ')}`);
+    const cmd = containerCreateOpts.Cmd || args || [];
+    logger.info(`Exectute in Docker ${image}: ${cmd.join(' ')}`);
 
-    const docker = new Dockerode();
     container = await docker.createContainer({
+      ...containerCreateOpts,
       Image: image,
-      Cmd: args,
-      HostConfig: {
+      Cmd: cmd,
+      HostConfig: containerCreateOpts.HostConfig || {
         Binds: [`${workspaceFolder}:/workspace`],
       },
     });
@@ -44,11 +59,15 @@ export const runInDocker = async (context: ToolContext, image: string, ...args: 
     const { output } = await container.wait();
     logger.info('Execution output:', output);
 
-    const logs = await container.logs({ stdout: true, stderr: true });
-    result = logs.toString('utf-8');
+    const logs = await container.logs({ stdout: true, stderr: stderr, follow: (follow as true) || false });
+    if (follow) {
+      result = await parseDockerLogs(logs, stderr);
+    } else {
+      result = (logs as unknown as Buffer).toString('utf-8');
+    }
   } catch (err) {
     logger.error('Failed to run in Docker:', err);
-    result = executeShell(context, false, ...args);
+    result = await executeShell(context, false, args || containerCreateOpts.Cmd!);
   } finally {
     if (container) {
       await container.stop();
@@ -60,33 +79,33 @@ export const runInDocker = async (context: ToolContext, image: string, ...args: 
   return result;
 };
 
-export const executeShell = async (
-  context: ToolContext,
-  alreadyInDocker: boolean,
-  ...args: string[]
-): Promise<string> => {
-  const command = args.join(' ');
-  if (!alreadyInDocker) {
-    // TODO: implement allow/deny list as per validate_command in AutoGPT
-    if (!(await context.askForUserPermission(`Can I run "${command}"?`))) {
-      return 'Command rejected by user';
-    }
-    logger.info(`Running locally: ${command}`);
-  }
-  return execSync(command, { cwd: context.workspaceFolder, encoding: 'utf-8' });
-};
+const parseDockerLogs = async (stream: NodeJS.ReadableStream, stderr: boolean): Promise<string> => {
+  return new Promise((resolve) => {
+    const output: string[] = [];
+    const errOutput: string[] = [];
 
-ToolManager.registerTool(executeShell, {
-  name: TOOL_EXECUTE_SHELL,
-  description: 'Execute a Shell Command, non-interactive commands only',
-  parameters: {
-    type: 'object',
-    properties: {
-      command_line: {
-        type: 'string',
-        description: 'The command line to execute',
+    const stdoutStream = new Writable({
+      write(chunk, _encoding, callback) {
+        output.push(chunk.toString('utf8'));
+        callback();
       },
-    },
-    required: ['command_line'],
-  },
-});
+    });
+
+    const stderrStream = new Writable({
+      write(chunk, _encoding, callback) {
+        errOutput.push(chunk.toString('utf8'));
+        callback();
+      },
+    });
+
+    docker.modem.demuxStream(stream, stdoutStream, stderrStream);
+
+    stream.on('end', function () {
+      let out = output.join('');
+      if (stderr) {
+        out = '# stdout\n' + out + '\n\n# stderr\n' + errOutput.join('');
+      }
+      resolve(out);
+    });
+  });
+};

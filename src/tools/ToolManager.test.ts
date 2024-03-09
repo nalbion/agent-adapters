@@ -1,7 +1,7 @@
 import { ToolManager } from './ToolManager';
-import { ToolCallback, ToolContext } from './tool_types';
+import { ToolCallback, ToolContext } from './ToolTypes';
 import { AgentContext } from '../agents/AgentContext';
-import { ToolDefinition } from './ToolDefinition';
+import { ToolDefinition } from './ToolTypes';
 
 describe('ToolManager', () => {
   let toolCallback: ToolCallback;

@@ -203,7 +203,16 @@ export default class AgentRegistry {
             const contextItems = context[key];
             const agentItems = agentContext[key];
 
-            if (agentItems?.some((item) => contextItems.includes(item))) {
+            if (
+              agentItems?.some((item) => {
+                if (Array.isArray(contextItems)) {
+                  return contextItems.includes(item);
+                } else if (typeof contextItems === 'string') {
+                  return contextItems === item;
+                }
+                return false;
+              })
+            ) {
               rank++;
             }
           });

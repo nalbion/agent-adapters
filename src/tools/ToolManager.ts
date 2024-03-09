@@ -1,7 +1,8 @@
 import { logger } from '../utils';
 import { Tool } from './Tool';
-import { ToolDefinition } from './ToolDefinition';
-import { ToolCallback, ToolConfig, ToolContext } from './tool_types';
+import { ToolDefinition } from './ToolTypes';
+import { ToolCallback, ToolContext } from './ToolTypes';
+import { ToolConfig } from './ToolConfig';
 
 export class ToolManager {
   private static tools: Record<string, ToolConfig> = {};

@@ -1,8 +1,15 @@
-import Agent, { type StepHandler, type StepInput, type StepResult, type TaskInput, Artifact } from 'agent-protocol';
+import { type Request, type Response } from 'express';
+import Agent, {
+  type StepHandler,
+  type StepInput,
+  type StepResult,
+  type TaskInput,
+  type Artifact,
+} from 'agent-protocol';
 import AgentProtocolServer from '../AgentProtocolServer';
 import { logger } from '../../../utils/Logger';
 import { AgentResponseStatus } from '../../types/AgentResponse';
-import { FileStorage } from 'any-cloud-storage';
+import { type FileStorage } from 'any-cloud-storage';
 
 /**
  * Handles incoming requests: POST /ap/v1/agent/task
@@ -38,7 +45,10 @@ export const startServer = (config: { port?: number; workspace?: string }) => {
   apAgent.start();
 };
 
-type ServerRequestHandler<R, S> = (request: R, response: S) => void | Promise<void>;
+type ServerRequestHandler<R extends Request = Request, S extends Response = Response> = (
+  request: R,
+  response: S,
+) => void | Promise<void>;
 type BuildServerConfig = {
   workspace?: string;
   // Waiting on https://github.com/AI-Engineer-Foundation/agent-protocol/pull/100
@@ -48,17 +58,17 @@ type BuildServerConfig = {
 const buildServer = (config: BuildServerConfig) => {
   apAgent = Agent.handleTask(taskHandler, config);
   // Waiting on https://github.com/AI-Engineer-Foundation/agent-protocol/pull/99
-  const apHandler = (apAgent as any).build() as ServerRequestHandler<R, S>; // the Express app
+  const apHandler = (apAgent as any).build() as ServerRequestHandler; // the Express app
   apAgent.start();
   return apHandler;
 };
 
-export const createServerless = <R = Request, S = Response>(
+export const createServerless = <R extends Request = Request, S extends Response = Response>(
   config: BuildServerConfig,
   promisedStorage?: Promise<FileStorage>,
 ) => {
   if (promisedStorage) {
-    const promisedHandler = promisedStorage.then((storage) => {
+    const promisedHandler = promisedStorage.then((_storage) => {
       // config.artifactStorage = ArtifactStorageFactory.create(config.artifactStorage);
       // config.artifactStorage = new AnyCloudArtifactStorage(storage);
       return buildServer(config);

@@ -1,8 +1,8 @@
-import path from 'path';
 import { ToolManager } from '../ToolManager';
-import { ToolContext } from '../tool_types';
+import { ToolContext } from '../ToolTypes';
 import { getAbsolutePathInWorkspace } from '../../utils/fileUtils';
 import { fileStorage } from '../../utils/fileStorage';
+import path from 'path';
 
 export const TOOL_WRITE_FILE = 'write_file';
 
@@ -16,7 +16,11 @@ const write_file = async (context: ToolContext, filename: string, contents: stri
 
   await fileStorage.saveTextFile(filePath, contents);
 
-  context.onProgress({ type: 'inlineContentReference', title: filename, inlineReference: filePath });
+  context.onProgress({
+    type: 'inlineContentReference',
+    title: `write_file(${path.basename(filename)})`,
+    inlineReference: filePath,
+  });
 };
 
 ToolManager.registerTool(write_file, {

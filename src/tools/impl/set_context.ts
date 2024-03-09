@@ -1,5 +1,5 @@
 import { ToolManager } from '../ToolManager';
-import { ToolContext } from '../tool_types';
+import { ToolContext } from '../ToolTypes';
 import { RoutingContextValues } from '../../types/AgentsYml';
 
 export const TOOL_SET_CONTEXT_VALUES = 'set_context_values';

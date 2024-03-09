@@ -6,7 +6,7 @@ describe('AgentContext', () => {
       // Given
       const existingContext = {
         languages: ['javascript', 'python'],
-        project: ['name'],
+        project_name: ['name'],
       };
 
       const newResponse = {
@@ -23,8 +23,8 @@ describe('AgentContext', () => {
 
       // Then
       expect(agentContext.routing).toEqual({
+        project_name: ['name'],
         languages: ['javascript', 'python', 'rust'],
-        project: ['name'],
         technologies: ['react'],
         platforms: ['web', 'mobile'],
       });
