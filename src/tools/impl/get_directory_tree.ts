@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { ToolManager } from '..';
+import { ToolManager } from '../ToolManager';
 import { ToolContext } from '../ToolTypes';
 
 export const TOOL_GET_DIRECTORY_TREE = 'get_directory_tree';

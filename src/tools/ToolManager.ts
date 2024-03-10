@@ -1,4 +1,4 @@
-import { logger } from '../utils';
+import { logger } from '../utils/Logger';
 import { Tool } from './Tool';
 import { ToolDefinition } from './ToolTypes';
 import { ToolCallback, ToolContext } from './ToolTypes';

@@ -1,6 +1,6 @@
 import { ToolContext } from '../tools/ToolTypes';
 import { get_directory_tree } from '../tools/impl/get_directory_tree';
-import { logger } from '../utils';
+import { logger } from '../utils/Logger';
 
 interface Disposable {
   dispose(): any;
