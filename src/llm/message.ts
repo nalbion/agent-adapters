@@ -1,10 +1,17 @@
 // as per 'openai/resources/index.mjs'
 export type ChatCompletionRole = 'system' | 'user' | 'assistant' | 'tool' | 'function';
 
-export type LlmMessage = {
-  role: ChatCompletionRole;
-  content: string;
-};
+export type LlmMessage =
+  | {
+      role: ChatCompletionRole;
+      content: string;
+    }
+  | {
+      role: 'assistant';
+      content?: string;
+      name?: string;
+      tool_calls: ChatCompletionMessageToolCall[];
+    };
 
 export type LlmRequestMessage =
   | {
