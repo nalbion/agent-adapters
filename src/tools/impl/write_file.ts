@@ -17,9 +17,12 @@ const write_file = async (context: ToolContext, filename: string, contents: stri
   await fileStorage.saveTextFile(filePath, contents);
 
   context.onProgress({
-    type: 'inlineContentReference',
-    title: `write_file(${path.basename(filename)})`,
-    inlineReference: filePath,
+    type: 'command',
+    command: {
+      title: `write_file('${path.basename(filePath)}')`,
+      command: TOOL_WRITE_FILE,
+      arguments: [filePath],
+    },
   });
 };
 

@@ -22,11 +22,11 @@ const execute_python_code = async (context: ToolContext, code: string) => {
     const result = await runPythonInDocker(context, ['-c', `"${code}"`]);
     content = 'Executed Python code: \n```' + result + '\n```';
 
-    context.onProgress({ type: 'content', content });
+    context.onProgress({ type: 'markdown', content });
   } catch (err) {
     content = 'Error executing Python code: \n```' + err + '\n```';
     logger.error('Failed to execute python code:', err);
-    context.onProgress({ type: 'content', content: content });
+    context.onProgress({ type: 'markdown', content: content });
   }
 
   return content;
@@ -63,7 +63,7 @@ const executePythonFile = async (context: ToolContext, filename: string, args: s
       content = `Error executing Python file: ${(error as Error).message}`;
     }
   }
-  context.onProgress({ type: 'content', content });
+  context.onProgress({ type: 'markdown', content });
   return content;
 };
 

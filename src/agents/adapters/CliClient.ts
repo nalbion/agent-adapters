@@ -95,7 +95,7 @@ export class CliClient {
     logger.info(`Monitoring process ${process.pid}`);
     // Open the markdown box
     if (this.wrapOutput) {
-      context.onProgress({ type: 'content', content: this.wrapOutput + '\n' });
+      context.onProgress({ type: 'markdown', content: this.wrapOutput + '\n' });
     }
 
     return new Promise((resolve, reject) => {
@@ -110,7 +110,7 @@ export class CliClient {
 
         try {
           stdout += chunk;
-          context.onProgress({ type: 'content', content: chunk });
+          context.onProgress({ type: 'markdown', content: chunk });
         } catch (err) {
           logger.error('Error formatting output:', err);
         }
@@ -121,7 +121,7 @@ export class CliClient {
           logger.info('presumably that is the end?');
 
           if (this.wrapOutput) {
-            context.onProgress({ type: 'content', content: `\n${this.wrapOutput}\n` });
+            context.onProgress({ type: 'markdown', content: `\n${this.wrapOutput}\n` });
           }
 
           removeListeners();
@@ -134,7 +134,7 @@ export class CliClient {
           stderr += data.toString();
 
           const content = data.toString();
-          context.onProgress({ type: 'content', content });
+          context.onProgress({ type: 'markdown', content });
         } catch (err) {
           logger.error('Error formatting error:', err);
         }

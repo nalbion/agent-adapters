@@ -98,7 +98,7 @@ export const openAiChatRequest = async (
       const content = chunk.choices[0].delta.content;
       if (content) {
         buffer += content;
-        onProgress({ type: 'content', content });
+        onProgress({ type: 'markdown', content });
       }
 
       // TODO: cancellation

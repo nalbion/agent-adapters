@@ -17,9 +17,12 @@ const read_file = async (context: ToolContext, filename: string, encoding?: Buff
   const contents = await fileStorage.readFile(filePath);
 
   context.onProgress({
-    type: 'inlineContentReference',
-    title: `read_file('${path.basename(filePath)}')`,
-    inlineReference: filePath,
+    type: 'command',
+    command: {
+      title: `read_file('${path.basename(filePath)}')`,
+      command: TOOL_READ_FILE,
+      arguments: [filePath],
+    },
   });
 
   return contents.toString(encoding);

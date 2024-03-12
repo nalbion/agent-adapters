@@ -23,7 +23,7 @@ export default class AgentProtocolClient extends Agent {
   override async receiveMessage(input: AgentInputMessage, context: AgentContext): Promise<AgentResponse> {
     const promisedStep = this.sendToRemoteAgent(input);
 
-    context.onProgress({ type: 'content', content: `Sending to remote agent at ${this.hostUrl}...\n\n` });
+    context.onProgress({ type: 'markdown', content: `Sending to remote agent at ${this.hostUrl}...\n\n` });
 
     const [step, content] = await promisedStep;
 
@@ -31,14 +31,14 @@ export default class AgentProtocolClient extends Agent {
       this.taskId = undefined;
     }
 
-    context.onProgress({ type: 'content', content: content + '\n\n' });
+    context.onProgress({ type: 'markdown', content: content + '\n\n' });
 
     const { command } = step.additional_output || {};
     if (command) {
       // TODO: ask_user(question: string)
       const toolResult = await ToolManager.executeTool(command.name, context, command.args);
       context.onProgress({
-        type: 'content',
+        type: 'markdown',
         content: `Executed tool: ${command.name}(${command.args}) with result: ${toolResult}`,
       });
     }

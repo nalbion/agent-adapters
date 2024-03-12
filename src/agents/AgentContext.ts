@@ -45,8 +45,14 @@ export type ProgressData =
       range?: { start: { line: number; character: number }; end: { line: number; character: number } };
     }
   | {
+      /** Offer a button for the user to execute a command */
       type: 'button';
       command: { title: string; command: string; tooltip?: string; arguments?: any[] };
+    }
+  | {
+      /** Automatically execute a command */
+      type: 'command';
+      command: { title: string; command: string; arguments?: any[] };
     }
   | {
       /** Represents a tree, such as a file and directory structure, rendered in the chat response */

@@ -172,7 +172,7 @@ export default abstract class Agent {
       if (input.command === command) {
         const response = callback();
         if (response) {
-          context.onProgress({ type: 'content', content: response.reply.content });
+          context.onProgress({ type: 'markdown', content: response.reply.content });
           return response;
         }
       }
