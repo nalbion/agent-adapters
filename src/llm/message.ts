@@ -17,12 +17,12 @@ export type LlmResponseMessage =
   | { role: 'assistant'; content: string };
 
 export type ChatCompletionMessageToolCall = {
-  // id: string;
+  id: string;
+  type: 'function';
   function: {
     name: string;
     arguments: string;
   };
-  // type: function;
 };
 
 export const assistantResponse = (content: string): LlmResponseMessage => ({
