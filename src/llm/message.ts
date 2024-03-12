@@ -6,11 +6,23 @@ export type LlmMessage = {
   content: string;
 };
 
-export type LlmRequestMessage = {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
-  name?: string;
-};
+export type LlmRequestMessage =
+  | {
+      role: 'system' | 'user' | 'assistant';
+      content: string;
+      name?: string;
+    }
+  | {
+      role: 'assistant';
+      content?: string;
+      name?: string;
+      tool_calls: ChatCompletionMessageToolCall[];
+    }
+  | {
+      role: 'tool';
+      tool_call_id: string;
+      content: string;
+    };
 
 export type LlmResponseMessage =
   | { role: 'tool'; tools: ChatCompletionMessageToolCall[] }

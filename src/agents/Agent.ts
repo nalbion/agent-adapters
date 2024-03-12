@@ -263,7 +263,7 @@ export default abstract class Agent {
   }
 
   protected getPromptFromFile(promptName: string, context: AgentContext): Promise<string | undefined> {
-    return getPromptFromFile(path.join(this.promptsDir, promptName + '.txt'), context);
+    return getPromptFromFile(path.join(this.promptsDir, promptName + '.hbs'), context);
   }
 
   /**
