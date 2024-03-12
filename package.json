@@ -1,6 +1,6 @@
 {
   "name": "agent-adapters",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Configurable AI Agents",
   "license": "MPL-2.0",
   "main": "dist/index.js",

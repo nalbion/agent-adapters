@@ -29,61 +29,46 @@ export type ProgressData =
   | {
       /** A piece of the chat response's content.
        *  Will be merged with other progress pieces as needed, and rendered as markdown. */
-      type: 'content';
-      /** The content as a string of markdown source */
-      content: string; // || MarkdownString;
+      type: 'markdown';
+      content: string;
+      // || MarkdownString {value: string, isTruested?: boolean | {enabledCommands: string[]}, supportThemeIcons?: boolean, supportHtml?: boolean, baseUri?: Uri};
     }
   | {
-      /**
-       * Represents a piece of the chat response's content that is resolved asynchronously.
-       * It is rendered immediately with a placeholder, which is replaced once the full content is available.
-       * @deprecated // Apparently this one type is going away
-       * https://github.com/microsoft/vscode/blob/96bc006c927c18fe87e15a824c0f2a4349104013/src/vs/workbench/api/common/extHostChatAgents2.ts#L135
-       */
-      type: 'task';
-      /** The markdown string to be rendered immediately. */
-      placeholder: string;
-      /** A Thenable resolving to the real content.
-       *  The placeholder will be replaced with this content once it's available.
-       *  eg:
-       *    resolvedContent: Promise.resolve({ content: response.content })
-       *    resolvedContent: Promise.resolve({ treeData: { label: "", uri: vscode.Uri.file(""), children: []} }) */
-      resolvedContent: Promise<unknown>; // ChatAgentContent | ChatAgentFileTree>;
+      type: 'progress';
+      content: string;
     }
   | {
-      /** Represents a tree, such as a file and directory structure, rendered in the chat response
-       *   eg: {treeData: { label: "", uri: vscode.Uri.file(""), children: []}}  */
+      /** An anchor is an inline reference to some type of resource */
+      type: 'anchor';
+      uri: string;
+      title?: string;
+      range?: { start: { line: number; character: number }; end: { line: number; character: number } };
+    }
+  | {
+      type: 'button';
+      command: { title: string; command: string; tooltip?: string; arguments?: any[] };
+    }
+  | {
+      /** Represents a tree, such as a file and directory structure, rendered in the chat response */
       type: 'fileTree';
-      /** The markdown string to be rendered immediately. */
-      treeData: unknown; // ChatAgentFileTreeData;
-    }
-  | {
-      /** Document references that should be used by the MappedEditsProvider */
-      type: 'usedContext';
-      /** Document references that should be used by the MappedEditsProvider */
-      documents: unknown[]; // ChatAgentDocumentContext[];
+      /** {name: string, children?: [{name, children}, ...]} */
+      treeData: TreeData;
     }
   | {
       /** Indicates a piece of content that was used by the chat agent while processing the request.
-       *  Will be displayed to the user. */
-      type: 'contentReference';
-      /** The resource that was referenced. */
-      reference: unknown; // Uri | Location;
-    }
-  | {
-      /** A reference to a piece of content that will be rendered inline with the markdown content. */
-      type: 'inlineContentReference';
-      /** The resource that was referenced. */
-      inlineReference: unknown; // Uri | Location;
-      /** An alternate title for the resource. */
-      title: string;
-    }
-  | {
-      // Requires chatAgents2Additions in package.json
-      type: 'agentDetection';
-      agentName: string;
-      command: string;
+       *  NOT rendered inline with response */
+      type: 'reference';
+      uri: string;
+      range?: { start: { line: number; character: number }; end: { line: number; character: number } };
     };
+// | {
+//     // Requires chatAgents2Additions in package.json
+//     type: 'agentDetection';
+//     agentName: string;
+//     command: string;
+// ;
+
+export type TreeData = { name: string; children?: TreeData[] };
 
 export type RoutingContextValue = string | string[] | { [key: string]: RoutingContextValue };
 export type RoutingContext = Record<string, RoutingContextValue>;
