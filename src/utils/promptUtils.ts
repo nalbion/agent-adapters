@@ -15,7 +15,7 @@ export const getPromptFromFile = async (filePath: string, context: AgentContext)
 };
 
 function replacePlaceholders(templateStr: string, context: AgentContext): string {
-  Handlebars.registerHelper('directory_tree', context.getDirectoryTree);
+  Handlebars.registerHelper('directory_tree', (depth?: number) => context.getDirectoryTree(depth));
   const template = compile(templateStr);
-  return template(context);
+  return template(context.routing);
 }

@@ -76,8 +76,14 @@ export type ProgressData =
 
 export type TreeData = { name: string; children?: TreeData[] };
 
-export type RoutingContextValue = string | string[] | { [key: string]: RoutingContextValue };
-export type RoutingContext = Record<string, RoutingContextValue>;
+export type RoutingContextValue =
+  | string
+  | string[]
+  | undefined
+  | {
+      [key: string]: RoutingContextValue;
+    };
+export type RoutingContext = Record<string, RoutingContextValue> & { modules?: RoutingContextValue[] };
 
 export class AgentContext implements ToolContext {
   routing: RoutingContext = {};
@@ -103,8 +109,8 @@ export class AgentContext implements ToolContext {
     return error;
   }
 
-  public getDirectoryTree(): string {
-    return get_directory_tree(this.workspaceFolder);
+  public getDirectoryTree(depth?: number): string {
+    return get_directory_tree(this.workspaceFolder, depth);
   }
 
   mergeRoutingContext(delta: RoutingContext) {

@@ -9,11 +9,17 @@ export const TOOL_GET_DIRECTORY_TREE = 'get_directory_tree';
  * Renders the directory tree structure in a simplified format.
  *
  * @param dirPath The starting directory path.
+ * @param depth how deep to go into the directory tree
  * @param prefix Prefix for the current item, used for recursion.
  * @param rootPath The root directory path - also used for recursion.
  * @returns A string representation of the directory tree.
  */
-export const get_directory_tree = (dirPath: string, prefix = '', rootPath: string | null = null): string => {
+export const get_directory_tree = (
+  dirPath: string,
+  depth: number = Number.MAX_VALUE,
+  prefix = '',
+  rootPath: string | null = null,
+): string => {
   let output = '';
   const indent = '  ';
 
@@ -51,11 +57,15 @@ export const get_directory_tree = (dirPath: string, prefix = '', rootPath: strin
     files.sort();
 
     if (dirs.length) {
-      output += '\n';
-      for (const dir of dirs) {
-        const itemPath = path.join(dirPath, dir);
+      if (depth === 0) {
+        output += ` [... ${dirs.length} more directories]\n`;
+      } else {
+        output += '\n';
         const newPrefix = prefix + indent;
-        output += get_directory_tree(itemPath, newPrefix, rootPath);
+        for (const dir of dirs) {
+          const itemPath = path.join(dirPath, dir);
+          output += get_directory_tree(itemPath, depth - 1, newPrefix, rootPath);
+        }
       }
 
       if (files.length) {
@@ -98,8 +108,11 @@ function shouldIgnoreFile(filePath: string): boolean {
 }
 
 ToolManager.registerTool(
-  (context: ToolContext, directoryPath?: string) =>
-    get_directory_tree(directoryPath ? path.join(context.workspaceFolder, directoryPath) : context.workspaceFolder),
+  (context: ToolContext, directoryPath?: string, depth?: number) =>
+    get_directory_tree(
+      directoryPath ? path.join(context.workspaceFolder, directoryPath) : context.workspaceFolder,
+      depth,
+    ),
   {
     name: TOOL_GET_DIRECTORY_TREE,
     description: 'Provides a directory listing in a tree format',
@@ -109,6 +122,10 @@ ToolManager.registerTool(
         path: {
           type: 'string',
           description: 'The root path to start the directory listing. Defaults to the project root.',
+        },
+        depth: {
+          type: 'number',
+          description: 'How deep to go into the directory tree',
         },
       },
       // required: ['path'],

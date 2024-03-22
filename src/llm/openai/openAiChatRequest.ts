@@ -19,10 +19,17 @@ const getLlmClient = (config: ModelConfig) => {
   return llmClients[config.model];
 };
 
-const toOpenAiMessage = ({ role, content }: LlmMessage): ChatCompletionMessageParam =>
-  ({ role, content }) as ChatCompletionMessageParam;
-export const fromOpenAiMessage = (message: LlmResponseMessage): LlmMessage =>
-  message.role === 'assistant' ? message : { role: 'tool', content: 'TODO: tool response' }; // JSON.stringify(message.tool.function) });
+const toOpenAiMessage = (message: LlmMessage): ChatCompletionMessageParam => {
+  return message as ChatCompletionMessageParam;
+  // if (message.role === 'assistant' && message.tool_calls) {
+  //   return { role: message.role, tool_calls: message.tool_calls } as ChatCompletionMessageParam;
+  // } else if (message.role === 'tool') {
+  //   return { role: message.role, content: message.content, tool_call_id: message.tool_call_id };
+  // }
+  // return { role: message.role, content: message.content } as ChatCompletionMessageParam;
+};
+export const fromOpenAiMessage = (message: LlmResponseMessage): LlmMessage => message as LlmMessage;
+// message.role === 'assistant' ? message : { role: 'tool', content: 'TODO: tool response' }; // JSON.stringify(message.tool.function) });
 
 export const openAiChatRequest = async (
   messages: LlmMessage[],

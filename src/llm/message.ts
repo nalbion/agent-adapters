@@ -3,7 +3,7 @@ export type ChatCompletionRole = 'system' | 'user' | 'assistant' | 'tool' | 'fun
 
 export type LlmMessage =
   | {
-      role: ChatCompletionRole;
+      role: 'system' | 'user' | 'assistant';
       content: string;
     }
   | {
@@ -11,6 +11,11 @@ export type LlmMessage =
       content?: string;
       name?: string;
       tool_calls: ChatCompletionMessageToolCall[];
+    }
+  | {
+      role: 'tool';
+      tool_call_id: string;
+      content: string;
     };
 
 export type LlmRequestMessage =
