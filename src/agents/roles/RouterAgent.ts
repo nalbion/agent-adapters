@@ -38,21 +38,29 @@ export default class RouterAgent extends Agent {
     // return receiveAlert(sender, input)
     this.logger.info('Router received message:', input.content);
 
-    if (!this.agent) {
-      this.agent = await this.chooseAgent(input, context);
-      this.logger.info('Selected new agent:', this.agent.name);
-    }
-
     while (true) {
+      if (!this.agent) {
+        this.agent = await this.chooseAgent(input, context);
+        this.logger.info('Selected new agent:', this.agent.name);
+      }
+
       let { reply, status } = await this.sendMessageToAgent(this.agent, input, context);
 
       this.logger.info('Router received reply from agent', this.agent.name, reply.content);
 
-      if (status !== AgentResponseStatus.NEXT_STEP || reply.content) {
+      if (reply.content) {
         context.onProgress({ type: 'markdown', content: reply.content });
+      } else {
+        // presumably we have nothing else to say to this agent
+        this.agent = undefined;
+      }
+
+      if (status === AgentResponseStatus.NEXT_STEP && !reply.content) {
+        // NEXT_STEP and nothing to say, keep going
+        input.command = undefined;
+      } else {
         return { reply, status };
       }
-      input.command = undefined;
     }
 
     // while (action is AgentAction) {
