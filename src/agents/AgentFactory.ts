@@ -3,6 +3,10 @@ import { Agent, AgentConfig } from '..';
 export default class AgentFactory {
   private static agentCreators: { [role: string]: (agentConfig: AgentConfig) => Agent } = {};
 
+  /**
+   * @param role can be a comma separated list of roles, but the roles should be sorted.
+   * @param agentCreator
+   */
   static registerAgentCreator(role: string, agentCreator: (agentConfig: AgentConfig) => Agent) {
     this.agentCreators[role] = agentCreator;
   }

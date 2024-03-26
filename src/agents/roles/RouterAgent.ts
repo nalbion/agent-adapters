@@ -10,28 +10,28 @@ import { AgentResponse, AgentResponseStatus } from '../types/AgentResponse';
 
 export default class RouterAgent extends Agent {
   private agent?: Agent;
-  private team: Agent[] = [];
+  // private team: Agent[] = [];
 
   constructor(agentConfig: AgentConfig) {
-    super(agentConfig);
+    super(agentConfig, 'router');
   }
 
-  /**
-   * Maps the agent names in the routing.team array to the actual Agent instances
-   * @param getAgent function provided by AgentRegistry to get an Agent instance by name
-   */
-  override updateTeam(getAgent: (name: string) => Agent) {
-    if (this.agentConfig.routing?.team) {
-      this.team = this.agentConfig.routing.team.map(getAgent);
-    }
-    // this.logger.info('RouterAgent.updateTeam', this.agentConfig.routing?.team, this.team);
-    super.updateTeam(getAgent);
-  }
+  // /**
+  //  * <strike reason="not used">Maps the agent names in the routing.team array to the actual Agent instances</strike>
+  //  * @param getAgent function provided by AgentRegistry to get an Agent instance by name
+  //  */
+  // override updateTeam(getAgent: (name: string) => Agent) {
+  //   if (this.agentConfig.routing?.team) {
+  //     this.team = this.agentConfig.routing.team.map(getAgent);
+  //   }
+  //   // this.logger.info('RouterAgent.updateTeam', this.agentConfig.routing?.team, this.team);
+  //   super.updateTeam(getAgent);
+  // }
 
-  override removeAgentFromTeam(name: string): void {
-    this.team = this.team.filter((agent) => agent.name !== name);
-    super.removeAgentFromTeam(name);
-  }
+  // override removeAgentFromTeam(name: string): void {
+  //   this.team = this.team.filter((agent) => agent.name !== name);
+  //   super.removeAgentFromTeam(name);
+  // }
 
   override async receiveMessage(input: AgentInputMessage, context: AgentContext): Promise<AgentResponse> {
     // if (type == 'alert'):
@@ -44,6 +44,7 @@ export default class RouterAgent extends Agent {
     }
 
     let { reply, status } = await this.sendMessageToAgent(this.agent, input, context);
+    debugger;
 
     this.logger.info('Router received reply from agent', this.agent.name, reply.content);
 
@@ -56,7 +57,7 @@ export default class RouterAgent extends Agent {
     // }
 
     // TODO: is this call necessary?
-    this.sendMessageToAgent('user', reply, context);
+    // this.sendMessageToAgent('user', reply, context);
     return { reply, status };
   }
 
@@ -86,14 +87,18 @@ export default class RouterAgent extends Agent {
     const filteredContent = filterContext(context.routing, contextKeysToCompare);
 
     // Filter the team of agents by context & name
-    const agents = this.filterAgentsByContext({
-      context: filteredContent,
-      contextKeysToCompare,
-      team: this.agentConfig.routing!.team,
-    });
-    this.logger.info('RouterAgent.chooseAgent', agents);
+    const agents = this.filterAgentsByContext(
+      {
+        context: filteredContent,
+        contextKeysToCompare,
+        team: this.agentConfig.routing!.team,
+      },
+      input,
+      context,
+    );
+    this.logger.info('RouterAgent.chooseAgent filtered to candidates:', agents);
 
-    let agent: string | undefined = agents[0]?.name;
+    let agentName: string | undefined = agents[0]?.name;
 
     if (agents.length > 1) {
       const systemMessage = this.prepareRoutingPrompt(filteredContent);
@@ -117,19 +122,21 @@ export default class RouterAgent extends Agent {
         const tool = response.tools[0];
         if (tool.function.name === AgentRegistry.SELECT_AGENT_TOOL) {
           const [resolvedAgent, setContext] = ToolManager.parseToolParameters(tool.function.arguments);
-          agent = resolvedAgent as string;
+          agentName = resolvedAgent as string;
 
           if (setContext) {
             context.mergeRoutingContext(setContext as AgentRoutingContext);
           }
         }
 
-        this.logger.info('LLM routed to agent:', agent);
+        this.logger.info('LLM routed to agent:', agentName);
       }
     }
 
     // The AgentRegistry will resolve the Agent by name, or select the highest ranking Agent according to the context.
-    return AgentRegistry.searchAgents(agent || '?', { context: context.routing })[0];
+    const agent = AgentRegistry.searchAgents(agentName || '?', { context: context.routing })[0];
+    context.onProgress({ type: 'progress', content: `Using agent: ${agent.name}` });
+    return agent;
   }
 
   protected prepareRoutingPrompt(filteredContent?: RoutingContext): string {

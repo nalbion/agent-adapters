@@ -114,7 +114,8 @@ export default abstract class Agent {
   }
 
   /**
-   * Adds the agent from agentConfig.routing.fallback to the fallbacks list
+   * Adds the agent from agentConfig.routing.fallback to the fallbacks list.
+   * Called by AgentRegistry.manageTeams()
    * @param getAgent function provided by AgentRegistry to get an Agent instance by name
    */
   updateTeam(getAgent: (name: string) => Agent) {
@@ -152,7 +153,7 @@ export default abstract class Agent {
    * Filters agents by role and sorts by context
    * @see filterAgentsByContext(), AgentRegistry.searchAgents()
    */
-  findAgentsByRole(role: string, context: RoutingContext): Agent[] {
+  findAgentsByRole(role: string, context?: RoutingContext): Agent[] {
     return AgentRegistry.searchAgents(role, { context, team: this.agentConfig.routing?.team });
     // TODO: use fallbacks?
   }
@@ -168,12 +169,14 @@ export default abstract class Agent {
   async receiveMessage(input: AgentInputMessage, context: AgentContext): Promise<AgentResponse> {
     logger.info(`Agent ${this.name} receiveMessage`, input);
 
-    for (const [command, callback] of Object.entries(this.slashCommandListeners)) {
-      if (input.command === command) {
-        const response = callback();
-        if (response) {
-          context.onProgress({ type: 'markdown', content: response.reply.content });
-          return response;
+    if (input.command) {
+      for (const [command, callback] of Object.entries(this.slashCommandListeners)) {
+        if (input.command === command) {
+          const response = callback();
+          if (response) {
+            context.onProgress({ type: 'markdown', content: response.reply.content });
+            return response;
+          }
         }
       }
     }
@@ -214,6 +217,7 @@ export default abstract class Agent {
     return response;
   }
 
+  /** processUserRequest() uses this, via getNextStepName() which calls areStepRequirementsMet() for each step until one returns true. */
   protected stepRequirements: { [stepName: string]: StepRequirement[] } = {};
 
   protected areStepRequirementsMet(stepName: string, context: AgentContext): boolean {
@@ -224,7 +228,7 @@ export default abstract class Agent {
     return true;
   }
 
-  protected getNextStepName(input: AgentInputMessage, context: AgentContext): string | undefined {
+  public getNextStepName(input: AgentInputMessage, context: AgentContext): string | undefined {
     let nextStep = input.command;
 
     if (!nextStep || !this.areStepRequirementsMet(nextStep, context)) {
@@ -281,10 +285,14 @@ export default abstract class Agent {
       return await resolvedAgents[0].receiveMessage(input, context);
     }
 
-    const fallbacks = this.filterAgentsByContext({
-      context: context.routing,
-      team: this.fallbacks.map((agent) => agent.name),
-    });
+    const fallbacks = this.filterAgentsByContext(
+      {
+        context: context.routing,
+        team: this.fallbacks.map((agent) => agent.name),
+      },
+      input,
+      context,
+    );
 
     if (fallbacks.length) {
       logger.info(`Agent ${this.name} sendMessageToAgent - fallback`, fallbacks[0].name);
@@ -348,7 +356,14 @@ export default abstract class Agent {
     return this._prepareChatRequestOptions(options);
   }
 
-  protected filterAgentsByContext(searchOpts: AgentSearchOpts): Agent[] {
+  /**
+   * param _input and _context are unused, but provided for use by subclasses.
+   */
+  protected filterAgentsByContext(
+    searchOpts: AgentSearchOpts,
+    _input: AgentInputMessage,
+    _context: AgentContext,
+  ): Agent[] {
     const role = '?';
     return AgentRegistry.searchAgents(role, searchOpts);
   }

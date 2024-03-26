@@ -9,7 +9,7 @@ export const areRequirementsMet = (context: RoutingContext, requirements?: StepR
   return requirements.every((requirement) => {
     // is the required key even in the context?
     if (!(requirement.name in context)) {
-      if (requirement.condition === 'undefined') {
+      if (requirement.condition === undefined) {
         return true;
       }
       return false;
@@ -17,10 +17,12 @@ export const areRequirementsMet = (context: RoutingContext, requirements?: StepR
 
     const contextValue = context[requirement.name];
 
-    if (requirement.condition) {
-      if (requirement.condition === 'undefined') {
-        return contextValue === undefined;
-      }
+    if (requirement.condition === undefined) {
+      return contextValue === undefined;
+    } else { // if (requirement.condition) {
+      // if (typeof requirement.condition === 'boolean') {
+      //   return contextValue === requirement.condition;
+      // }
       if (typeof requirement.condition === 'number') {
         return Array.isArray(contextValue) || typeof contextValue === 'string'
           ? contextValue.length >= requirement.condition

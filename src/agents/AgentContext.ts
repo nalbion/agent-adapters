@@ -1,3 +1,4 @@
+import * as os from 'os';
 import { ToolContext } from '../tools/ToolTypes';
 import { get_directory_tree } from '../tools/impl/get_directory_tree';
 import { logger } from '../utils/Logger';
@@ -79,6 +80,7 @@ export type TreeData = { name: string; children?: TreeData[] };
 export type RoutingContextValue =
   | string
   | string[]
+  | boolean
   | undefined
   | {
       [key: string]: RoutingContextValue;
@@ -86,7 +88,11 @@ export type RoutingContextValue =
 export type RoutingContext = Record<string, RoutingContextValue> & { modules?: RoutingContextValue[] };
 
 export class AgentContext implements ToolContext {
-  routing: RoutingContext = {};
+  routing: RoutingContext = {
+    // 'aix', 'darwin', 'freebsd', 'linux', 'openbsd', 'sunos', and 'win32'.
+    os: os.platform(),
+  };
+  // updatedByLlm = false;
 
   constructor(
     public workspaceFolder = process.cwd(),
@@ -135,6 +141,8 @@ export class AgentContext implements ToolContext {
     });
 
     this.routing = mergedContext;
+    // this.updatedByLlm = true;
+    // this.routing['updated_by_llm'] = true;
     return mergedContext;
   }
 }

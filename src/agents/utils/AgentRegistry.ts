@@ -43,6 +43,10 @@ export default class AgentRegistry {
     }
   }
 
+  /**
+   * Should be called after all agents are created.
+   * Updates the teams of each agent, provides a name->Agent lookup.
+   */
   static manageTeams() {
     for (const agent of Object.values(this.agents)) {
       agent.updateTeam((name) => this.agents[name]);
@@ -81,7 +85,17 @@ export default class AgentRegistry {
 
     // If no role is given, return all agents
     if (!agentConfigs) {
-      agentConfigs = Object.values(this.agentsByRole).flat();
+      agentConfigs = Object.values(
+        Object.values(this.agentsByRole)
+          .flat()
+          .reduce(
+            (acc, cur) => {
+              acc[cur.name] = cur;
+              return acc;
+            },
+            {} as { [name: string]: AgentConfig },
+          ),
+      );
       // console.info('No role given, using all agents:', agentConfigs);
     }
 
