@@ -14,3 +14,7 @@ export type AgentResponse = {
   status?: AgentResponseStatus;
   followups?: FollowUp[];
 };
+
+export const nextStepResponse = (): AgentResponse => {
+  return { reply: { content: '' }, status: AgentResponseStatus.NEXT_STEP };
+};

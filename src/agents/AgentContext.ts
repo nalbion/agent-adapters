@@ -85,7 +85,9 @@ export type RoutingContextValue =
   | {
       [key: string]: RoutingContextValue;
     };
-export type RoutingContext = Record<string, RoutingContextValue> & { modules?: RoutingContextValue[] };
+export type RoutingContext = Record<string, RoutingContextValue> & {
+  modules?: Array<{ [key: string]: RoutingContextValue }>;
+};
 
 export class AgentContext implements ToolContext {
   routing: RoutingContext = {
@@ -119,26 +121,10 @@ export class AgentContext implements ToolContext {
     return get_directory_tree(this.workspaceFolder, depth);
   }
 
-  mergeRoutingContext(delta: RoutingContext) {
+  mergeRoutingContext(delta: RoutingContext): RoutingContext {
     const mergedContext = { ...this.routing };
 
-    Object.keys(delta).forEach((key) => {
-      if (mergedContext.hasOwnProperty(key)) {
-        // Merge arrays and remove duplicates
-        const mergedValue = mergedContext[key];
-        const deltaValue = delta[key];
-        if (Array.isArray(mergedValue) && Array.isArray(deltaValue)) {
-          mergedContext[key] = Array.from(new Set([...mergedValue, ...deltaValue]));
-        } else if (typeof mergedValue === 'object' && typeof deltaValue === 'object') {
-          mergedContext[key] = { ...mergedValue, ...deltaValue };
-        } else {
-          mergedContext[key] = deltaValue;
-        }
-      } else {
-        // Add new key and value
-        mergedContext[key] = delta[key];
-      }
-    });
+    mergeRoutingContext(mergedContext, delta);
 
     this.routing = mergedContext;
     // this.updatedByLlm = true;
@@ -146,3 +132,43 @@ export class AgentContext implements ToolContext {
     return mergedContext;
   }
 }
+
+const mergeRoutingContext = (
+  mergedContext: RoutingContext,
+  delta: RoutingContext,
+  allowRecursion = true,
+): RoutingContext => {
+  Object.keys(delta).forEach((key) => {
+    if (mergedContext.hasOwnProperty(key)) {
+      // Merge arrays and remove duplicates
+      const mergedValue = mergedContext[key];
+      const deltaValue = delta[key];
+      if (Array.isArray(mergedValue) && Array.isArray(deltaValue)) {
+        if (key === 'modules' && allowRecursion) {
+          debugger;
+          const existingModules = mergedValue as unknown as Array<{ [key: string]: RoutingContextValue }>;
+          const deltaModules = deltaValue as unknown as Array<{ [key: string]: RoutingContextValue }>;
+          for (const deltaModule of deltaModules) {
+            const existing = existingModules.find((m) => m.name === deltaModule.name);
+            if (existing) {
+              mergeRoutingContext(existing, deltaModule, false);
+            } else {
+              existingModules.push(deltaModule);
+            }
+          }
+        } else {
+          mergedContext[key] = Array.from(new Set([...mergedValue, ...deltaValue]));
+        }
+      } else if (typeof mergedValue === 'object' && typeof deltaValue === 'object') {
+        mergedContext[key] = { ...mergedValue, ...deltaValue };
+      } else {
+        mergedContext[key] = deltaValue;
+      }
+    } else {
+      // Add new key and value
+      mergedContext[key] = delta[key];
+    }
+  });
+
+  return mergedContext;
+};

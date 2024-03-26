@@ -43,10 +43,17 @@ export default class RouterAgent extends Agent {
       this.logger.info('Selected new agent:', this.agent.name);
     }
 
-    let { reply, status } = await this.sendMessageToAgent(this.agent, input, context);
-    debugger;
+    while (true) {
+      let { reply, status } = await this.sendMessageToAgent(this.agent, input, context);
 
-    this.logger.info('Router received reply from agent', this.agent.name, reply.content);
+      this.logger.info('Router received reply from agent', this.agent.name, reply.content);
+
+      if (status !== AgentResponseStatus.NEXT_STEP || reply.content) {
+        context.onProgress({ type: 'markdown', content: reply.content });
+        return { reply, status };
+      }
+      input.command = undefined;
+    }
 
     // while (action is AgentAction) {
     //   reply, action = self.route_action(action)
@@ -58,7 +65,7 @@ export default class RouterAgent extends Agent {
 
     // TODO: is this call necessary?
     // this.sendMessageToAgent('user', reply, context);
-    return { reply, status };
+    // return { reply, status };
   }
 
   /**

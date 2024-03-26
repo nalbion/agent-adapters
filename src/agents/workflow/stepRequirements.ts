@@ -19,7 +19,8 @@ export const areRequirementsMet = (context: RoutingContext, requirements?: StepR
 
     if (requirement.condition === undefined) {
       return contextValue === undefined;
-    } else { // if (requirement.condition) {
+    } else {
+      // if (requirement.condition) {
       // if (typeof requirement.condition === 'boolean') {
       //   return contextValue === requirement.condition;
       // }
@@ -29,6 +30,9 @@ export const areRequirementsMet = (context: RoutingContext, requirements?: StepR
           : false;
       }
       if (Array.isArray(contextValue)) {
+        if (requirement.condition.startsWith('!')) {
+          return !contextValue.includes(requirement.condition.slice(1));
+        }
         return contextValue.includes(requirement.condition);
       }
       if (
