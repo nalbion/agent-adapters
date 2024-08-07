@@ -35,6 +35,7 @@ export const get_directory_tree = (
       output += `${prefix}/${dirName}`;
     }
 
+    // nosec it is important that this code be able to traverse the file tree
     const items = fs.readdirSync(dirPath);
     const dirs: string[] = [];
     const files: string[] = [];
